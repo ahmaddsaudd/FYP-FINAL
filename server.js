@@ -2,6 +2,9 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const authRoutes = require("./routes/authRoutes");
+const videoRoutes =  require("./routes/videoRoutes");
+const cors = require('cors'); // Import cors middleware
+
 
 
 const connectDB = require("./dbConnect");
@@ -10,6 +13,8 @@ connectDB();
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON bodies
+app.use(cors()); // Enable CORS for all origins
+
 
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -20,6 +25,7 @@ const io = socketIo(server, {
 });
 
 app.use('/auth',authRoutes);
+app.use('/video',videoRoutes);
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
