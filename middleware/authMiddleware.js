@@ -1,14 +1,16 @@
-module.exports = {
-    ensureAuthenticated: function (req, res, next) {
-        if (req.isAuthenticated()) {
-            return next();
-        }
-        res.status(401).json({ success: false, message: 'Not authenticated' });
-    },
-    forwardAuthenticated: function (req, res, next) {
-        if (!req.isAuthenticated()) {
-            return next();
-        }
-        res.status(403).json({ success: false, message: 'Already authenticated' });
+const jwt = require("jsonwebtoken");
+
+const authenticate = (req, res, next) => {
+    const token = req.header('Authorization');
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
+  
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.userId = decoded.userId;
+      next();
+    } catch (error) {
+      res.status(401).json({ message: 'Token is not valid' });
     }
-};
+  };
+  
+module.exports = authenticate;
